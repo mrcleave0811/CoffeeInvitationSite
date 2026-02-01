@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Be My Valentine?</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Fredoka+One&display=swap');
+
+    /* Background */
+    body, html {
+      height: 100%;
+      margin: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-family: 'Fredoka One', cursive;
+      background: url(/bg.webp) center/cover no-repeat fixed;
+      overflow: hidden;
+    }
+
+    /* Content Card */
+    .card {
+      background-color: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      border-radius: 20px;
+      padding: 30px 40px;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+      max-width: 90%;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.3);
+      position: relative;
+    }
+
+    h1 {
+      font-size: 2.5rem;
+      margin: 0;
+      color: #6C0BA9;
+      text-shadow: 2px 2px 5px rgba(0,0,0,0.3);
+    }
+
+    .name {
+      color: #6C0BA9;
+    }
+
+    .profile-pic {
+      width: 150px;
+      height: 150px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 4px solid #fff;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    }
+
+    .buttons {
+      display: flex;
+      gap: 20px;
+      flex-wrap: wrap;
+      justify-content: center;
+      position: relative;
+      width: 100%;
+      height: 80px; 
+    }
+
+    /* NO button */
+    #no {
+      background-color: #9b59b6;
+      color: #fff;
+      font-size: 1.5rem;
+      padding: 15px 35px;
+      border: none;
+      border-radius: 50px;
+      cursor: pointer;
+      transition: transform 0.2s, background 0.3s;
+      box-shadow: 2px 2px 10px rgba(0,0,0,0.2);
+      position: absolute;
+    }
+
+    /* YES button - twice the size */
+    #yes {
+      background-color: #ff5ec4;
+      color: #fff;
+      font-size: 3rem;
+      padding: 30px 70px;
+      border: none;
+      border-radius: 50px;
+      cursor: pointer;
+      transition: transform 0.2s, background 0.3s;
+      box-shadow: 2px 2px 10px rgba(0,0,0,0.2);
+      position: relative;
+    }
+
+    #message {
+      margin-top: 30px;
+      font-size: 2rem;
+      display: none;
+      color: #6C0BA9;
+      animation: pop 0.5s ease-out;
+    }
+
+    #cat {
+      width: 200px;
+      height: auto;
+      margin-top: 20px;
+      display: none;
+      border-radius: 20px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+      position: relative;
+      z-index: 1;
+    }
+
+    /* Peonies */
+    .peony {
+      width: 100px;
+      height: auto;
+      position: absolute;
+      top: calc(50% + 50px); /* slightly below cat */
+      display: none;
+      z-index: 0;
+    }
+
+    #peony-left {
+      left: 20px;
+    }
+
+    #peony-right {
+      right: 20px;
+    }
+
+    @keyframes pop {
+      0% { transform: scale(0); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+
+    /* Confetti */
+    .confetti {
+      position: absolute;
+      width: 10px;
+      height: 10px;
+      background-color: #fff;
+      opacity: 0.7;
+      top: 0;
+      animation: fall 3s linear infinite;
+    }
+
+    @keyframes fall {
+      0% { transform: translateY(0) rotate(0deg); }
+      100% { transform: translateY(100vh) rotate(360deg); }
+    }
+
+    /* Responsive */
+    @media (max-width: 600px) {
+      h1 { font-size: 1.8rem; }
+      #no { font-size: 1.2rem; padding: 12px 25px; }
+      #yes { font-size: 2.4rem; padding: 24px 50px; }
+      .profile-pic { width: 120px; height: 120px; }
+      #cat { width: 150px; }
+      .peony { width: 70px; }
+      .card { padding: 20px; }
+      .buttons { height: 60px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <img src="/her.jpg" alt="Her Picture" class="profile-pic">
+    <h1><span class="name">Donnaaaa</span>, Shall we grab coffee on Feb 13?</h1>
+    <div class="buttons">
+      <button id="yes">YES</button>
+      <button id="no">NO</button>
+    </div>
+    <div id="message">Yay! See you! 🥰</div>
+    <img id="cat" src="/catto.gif" alt="Happy Cat">
+    <img id="peony-left" class="peony" src="/peony.png" alt="Peony Left">
+    <img id="peony-right" class="peony" src="/peony.png" alt="Peony Right">
+  </div>
+
+  <script>
+    const noBtn = document.getElementById('no');
+    const yesBtn = document.getElementById('yes');
+    const message = document.getElementById('message');
+    const cat = document.getElementById('cat');
+    const peonyLeft = document.getElementById('peony-left');
+    const peonyRight = document.getElementById('peony-right');
+    const buttonsDiv = document.querySelector('.buttons');
+    let chasing = true;
+
+    function moveNoButton() {
+      const padding = 5;
+      const maxX = buttonsDiv.offsetWidth - noBtn.offsetWidth - padding;
+      const maxY = buttonsDiv.offsetHeight - noBtn.offsetHeight - padding;
+
+      let randomX, randomY;
+      let attempts = 0;
+
+      do {
+        randomX = Math.floor(Math.random() * maxX);
+        randomY = Math.floor(Math.random() * maxY);
+        attempts++;
+        if(attempts > 100) break;
+      } while (isOverlappingYes(randomX, randomY));
+
+      noBtn.style.left = randomX + 'px';
+      noBtn.style.top = randomY + 'px';
+    }
+
+    function isOverlappingYes(x, y) {
+      const yesX = yesBtn.offsetLeft;
+      const yesY = yesBtn.offsetTop;
+      const yesW = yesBtn.offsetWidth;
+      const yesH = yesBtn.offsetHeight;
+
+      const noW = noBtn.offsetWidth;
+      const noH = noBtn.offsetHeight;
+
+      return !(x + noW < yesX || x > yesX + yesW || y + noH < yesY || y > yesY + yesH);
+    }
+
+    buttonsDiv.addEventListener('mousemove', (e) => {
+      if (!chasing) return;
+      const noRect = noBtn.getBoundingClientRect();
+      const buttonsRect = buttonsDiv.getBoundingClientRect();
+      const cursorX = e.clientX - buttonsRect.left;
+      const cursorY = e.clientY - buttonsRect.top;
+      const noCenterX = noRect.left - buttonsRect.left + noRect.width / 2;
+      const noCenterY = noRect.top - buttonsRect.top + noRect.height / 2;
+      const distance = Math.hypot(cursorX - noCenterX, cursorY - noCenterY);
+      if (distance < 100) moveNoButton();
+    });
+
+    noBtn.addEventListener('click', (e) => {
+      if (!chasing) return;
+      e.preventDefault();
+      moveNoButton();
+    });
+
+    yesBtn.addEventListener('click', () => {
+      chasing = false;
+      noBtn.style.display = 'none';
+      message.style.display = 'block';
+      cat.style.display = 'block';
+      peonyLeft.style.display = 'block';
+      peonyRight.style.display = 'block';
+      spawnConfetti(100);
+    });
+
+    moveNoButton();
+
+    function spawnConfetti(num) {
+      for (let i = 0; i < num; i++) {
+        const confetti = document.createElement('div');
+        confetti.classList.add('confetti');
+        confetti.style.left = Math.random() * window.innerWidth + 'px';
+        confetti.style.backgroundColor = `hsl(${Math.random()*360}, 100%, 70%)`;
+        confetti.style.animationDuration = (2 + Math.random() * 3) + 's';
+        document.body.appendChild(confetti);
+        setTimeout(() => confetti.remove(), 5000);
+      }
+    }
+  </script>
+</body>
+</html>
